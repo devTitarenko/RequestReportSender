@@ -4,9 +4,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-/**
- * Created by Titarenko on 19.06.2017 at 23:14.
- */
 @Entity(name = "country" )
 public class Country extends BaseObject{
 
@@ -41,5 +38,13 @@ public class Country extends BaseObject{
 
     public void setLocationList(List<Location> locationList) {
         this.locationList = locationList;
+    }
+
+    @Override
+    public String toString() {
+        return "Country{" +
+                "countryName='" + countryName + '\'' +
+                ", language='" + language + '\'' +
+                '}';
     }
 }
