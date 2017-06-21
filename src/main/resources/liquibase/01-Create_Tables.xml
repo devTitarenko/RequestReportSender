@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+
+    <changeSet author="Titarenko" id="01-Create_Tables" failOnError="true">
+        <comment>DB Initialization</comment>
+
+        <createTable tableName="user_group">
+            <column name="id" type="integer(10)" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="group_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="country">
+            <column name="id" type="integer(10)" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="country_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="language" type="varchar(50)"/>
+        </createTable>
+
+        <createTable tableName="location">
+            <column name="id" type="integer(10)" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="location_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="country_id" type="integer(10)">
+                <constraints references="country(id)" deleteCascade="true"
+                             foreignKeyName="fk_location_country"/>
+            </column>
+            <column name="latitude" type="decimal"/>
+            <column name="longitude" type="decimal"/>
+        </createTable>
+
+        <createTable tableName="user">
+            <column name="id" type="integer(10)" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_name" type="integer(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location_id" type="integer(10)">
+                <constraints references="location(id)" deleteCascade="true"
+                             foreignKeyName="fk_user_location"/>
+            </column>
+            <column name="user_group_id" type="integer(10)">
+                <constraints references="user_group(id)" deleteCascade="true"
+                             foreignKeyName="fk_user_user_group"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="session">
+            <column name="id" type="integer(10)" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="integer(10)">
+                <constraints references="user(id)" deleteCascade="true"
+                             foreignKeyName="fk_session_user"/>
+            </column>
+            <column name="date_opened" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_closed" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="request">
+            <column name="id" type="integer(10)" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="url" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="method" type="varchar(10)"/>
+            <column name="params" type="text(1000)"/>
+            <column name="session_id" type="integer(10)">
+                <constraints references="session(id)" deleteCascade="true"
+                             foreignKeyName="fk_request_session"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
