@@ -57,4 +57,13 @@ public class Session extends BaseObject {
     public void setRequestList(List<Request> requestList) {
         this.requestList = requestList;
     }
+
+    @Override
+    public String toString() {
+        return "Session{" +
+                ", dateOpened=" + dateOpened +
+                ", dateClosed=" + dateClosed +
+                ", requestList=" + requestList +
+                '}';
+    }
 }

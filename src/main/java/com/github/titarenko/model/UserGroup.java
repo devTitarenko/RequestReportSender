@@ -32,4 +32,12 @@ public class UserGroup extends BaseObject {
     public void setUserList(List<User> userList) {
         this.userList = userList;
     }
+
+    @Override
+    public String toString() {
+        return "UserGroup{" +
+                "id=" + getId() +
+                "groupName='" + groupName + '\'' +
+                '}';
+    }
 }

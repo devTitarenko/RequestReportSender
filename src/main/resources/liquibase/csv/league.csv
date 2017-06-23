@@ -1,0 +1,6 @@
+"PK_LEAGUE_ID","LEAGUENAME","FK_LEAGUECOUNTRY_ID"
+1200,"Serie A","IT"
+1300,"Bundesliga","DE"
+1400,"Ligue 1","FR"
+1000,"Premier League","EN"
+1100,"LaLiga","SP"

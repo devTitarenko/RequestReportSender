@@ -40,8 +40,8 @@
                 <constraints references="country(id)" deleteCascade="true"
                              foreignKeyName="fk_location_country"/>
             </column>
-            <column name="latitude" type="decimal"/>
-            <column name="longitude" type="decimal"/>
+            <column name="latitude" type="decimal(30,10)"/>
+            <column name="longitude" type="decimal(30,10)"/>
         </createTable>
 
         <createTable tableName="user">

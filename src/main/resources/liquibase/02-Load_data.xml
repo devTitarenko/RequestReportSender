@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+
+    <changeSet author="Titarenko" id="02-Load_data" failOnError="true">
+        <comment>DB Population</comment>
+
+        <loadData tableName="user_group"
+                  file="csv/user_group.csv"
+                  encoding="UTF-8"
+                  relativeToChangelogFile="true">
+            <column name="id" type="NUMERIC"/>
+            <column name="group_name" type="STRING"/>
+        </loadData>
+        <loadData tableName="country"
+                  file="csv/country.csv"
+                  encoding="UTF-8"
+                  relativeToChangelogFile="true">
+            <column name="id" type="NUMERIC"/>
+            <column name="country_name" type="STRING"/>
+            <column name="language" type="STRING"/>
+        </loadData>
+        <loadData tableName="location"
+                  file="csv/location.csv"
+                  encoding="UTF-8"
+                  relativeToChangelogFile="true">
+            <column name="id" type="NUMERIC"/>
+            <column name="location_name" type="STRING"/>
+            <column name="country_id" type="NUMERIC"/>
+            <column name="latitude" type="NUMERIC"/>
+            <column name="longitude" type="NUMERIC"/>
+        </loadData>
+        <loadData tableName="user"
+                  file="csv/user.csv"
+                  encoding="UTF-8"
+                  relativeToChangelogFile="true">
+            <column name="id" type="NUMERIC"/>
+            <column name="user_name" type="NUMERIC"/>
+            <column name="location_id" type="NUMERIC"/>
+            <column name="user_group_id" type="NUMERIC"/>
+        </loadData>
+        <loadData tableName="session"
+                  file="csv/session.csv"
+                  encoding="UTF-8"
+                  relativeToChangelogFile="true">
+            <column name="id" type="NUMERIC"/>
+            <column name="user_id" type="NUMERIC"/>
+            <column name="date_opened" type="DATE"/>
+            <column name="date_closed" type="DATE"/>
+        </loadData>
+        <loadData tableName="request"
+                  file="csv/request.csv"
+                  encoding="UTF-8"
+                  relativeToChangelogFile="true">
+            <column name="id" type="NUMERIC"/>
+            <column name="url" type="STRING"/>
+            <column name="method" type="STRING"/>
+            <column name="params" type="STRING"/>
+            <column name="session_id" type="NUMERIC"/>
+        </loadData>
+    </changeSet>
+</databaseChangeLog>

@@ -8,5 +8,7 @@
 
     <include file="01-Create_Tables.xml"
              relativeToChangelogFile="true"/>
+    <include file="02-Load_data.xml"
+             relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

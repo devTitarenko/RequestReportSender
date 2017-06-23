@@ -56,4 +56,15 @@ public class User extends BaseObject {
     public void setSessionList(List<Session> sessionList) {
         this.sessionList = sessionList;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + getId() +
+                "userName=" + userName +
+                ", location=" + location +
+                ", userGroup=" + userGroup +
+                ", sessionList=" + sessionList +
+                '}';
+    }
 }

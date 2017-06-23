@@ -53,4 +53,13 @@ public class Request extends BaseObject {
     public void setSession(Session session) {
         this.session = session;
     }
+
+    @Override
+    public String toString() {
+        return "Request{" +
+                "url='" + url + '\'' +
+                ", method='" + method + '\'' +
+                ", params='" + params + '\'' +
+                '}';
+    }
 }

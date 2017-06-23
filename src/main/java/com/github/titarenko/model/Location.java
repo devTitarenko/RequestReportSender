@@ -64,4 +64,14 @@ public class Location extends BaseObject{
     public void setUserList(List<User> userList) {
         this.userList = userList;
     }
+
+    @Override
+    public String toString() {
+        return "Location{" +
+                "locationName='" + locationName + '\'' +
+                ", country=" + country +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                '}';
+    }
 }
