@@ -1,15 +1,16 @@
 package com.github.titarenko.model;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-/**
- * Created by Titarenko on 19.06.2017 at 23:14.
- */
+@NamedQueries({
+        @NamedQuery(name = "RequestByDate",
+                query = "SELECT r FROM request r JOIN r.session s " +
+                        "WHERE :date BETWEEN s.dateOpened AND s.dateClosed")
+})
 @Entity(name = "request")
 public class Request extends BaseObject {
+    public static final String FIND_BY_DATE = "RequestByDate";
 
     @NotNull
     private String url;
@@ -57,7 +58,8 @@ public class Request extends BaseObject {
     @Override
     public String toString() {
         return "Request{" +
-                "url='" + url + '\'' +
+                "id=" + getId() +
+                ", url='" + url + '\'' +
                 ", method='" + method + '\'' +
                 ", params='" + params + '\'' +
                 '}';

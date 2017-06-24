@@ -4,9 +4,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-/**
- * Created by Titarenko on 19.06.2017 at 23:14.
- */
 @Entity(name = "location")
 public class Location extends BaseObject{
 

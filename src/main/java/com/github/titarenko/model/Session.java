@@ -5,9 +5,6 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by Titarenko on 19.06.2017 at 23:14.
- */
 @Entity(name = "session")
 public class Session extends BaseObject {
 
@@ -61,6 +58,7 @@ public class Session extends BaseObject {
     @Override
     public String toString() {
         return "Session{" +
+                "id=" + getId() +
                 ", dateOpened=" + dateOpened +
                 ", dateClosed=" + dateClosed +
                 ", requestList=" + requestList +

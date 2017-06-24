@@ -7,10 +7,6 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 
-/**
- * Created by Titarenko on 19.06.2017 at 23:31.
- */
-
 @MappedSuperclass
 public abstract class BaseObject implements Serializable {
     @Id

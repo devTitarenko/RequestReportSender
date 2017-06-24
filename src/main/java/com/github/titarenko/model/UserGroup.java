@@ -4,9 +4,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-/**
- * Created by Titarenko on 19.06.2017 at 23:13.
- */
 @Entity(name = "user_group")
 public class UserGroup extends BaseObject {
 
