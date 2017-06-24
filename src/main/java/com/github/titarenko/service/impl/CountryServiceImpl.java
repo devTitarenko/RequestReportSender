@@ -15,7 +15,7 @@ public class CountryServiceImpl implements CountryService {
     private CountryDao countryDao;
 
     @Override
-    public List<Country> getAllCountriesList() {
+    public List<Country> getAllCountries() {
         return countryDao.getAll();
     }
 }
