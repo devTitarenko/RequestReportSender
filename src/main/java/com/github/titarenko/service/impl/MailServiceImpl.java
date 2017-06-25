@@ -3,6 +3,8 @@ package com.github.titarenko.service.impl;
 import com.github.titarenko.dao.impl.RequestDaoImpl;
 import com.github.titarenko.model.DocumentFormat;
 import com.github.titarenko.service.MailService;
+import com.github.titarenko.validation.EmailValidator;
+import com.github.titarenko.validation.Validator;
 import com.sun.org.apache.xml.internal.serialize.LineSeparator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +14,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
 
-import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletContext;
 import java.io.File;
 import java.util.regex.Matcher;
@@ -28,16 +29,13 @@ public class MailServiceImpl implements MailService {
     private String email;
     private DocumentFormat format;
     private static final String FILE_NAME = "report";
-    private static final String EMAIL_PATTERN =
-            "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
     private static final Logger LOGGER = Logger.getLogger(RequestDaoImpl.class);
 
     @Override
     public void sendEmail(String email, DocumentFormat format) {
-        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-        Matcher matcher = pattern.matcher(email);
-        if (!matcher.matches()) {
+        Validator validator = new EmailValidator(email);
+        if (!validator.validate()) {
             LOGGER.error("Email doesn't match pattern");
             throw new IllegalArgumentException("Invalid email");
         }
@@ -49,7 +47,7 @@ public class MailServiceImpl implements MailService {
 
         try {
             mailSender.send(preparator);
-            LOGGER.info("Message With Attachement has been sent to " + email);
+            LOGGER.info("Message With Attachment has been sent to " + email);
         } catch (MailException ex) {
             System.err.println(ex.getMessage());
         }

@@ -24,19 +24,42 @@ public class MainController {
 
     @RequestMapping(value = "/")
     public String requestWithParams(ModelMap model,
-                         @RequestParam("email") String email,
-                         @RequestParam(required = false, value = "doc_format") String format,
-                         @RequestParam(required = false, value = "filter") String dateFilter) {
+                                    @RequestParam("email") String email,
+                                    @RequestParam(required = false, value = "doc_format") String format,
+                                    @RequestParam(required = false, value = "filter") String filter) {
 
-        String string = "email: " + email +
-                ", doc_format: " + format +
-                ", filter: " + dateFilter;
-        DocumentFormat documentFormat = DocumentFormat.valueOf(format.toUpperCase());
+        String message = "email: " + email +
+                ", doc format: " + format +
+                ", filter: " + filter;
 
-        documentGenerator.createReport(documentFormat, Date.valueOf(dateFilter));
-        mailService.sendEmail(email, documentFormat);
+        DocumentFormat documentFormat = DocumentFormat.DOC;
+        Date dateFilter = null;
 
-        model.addAttribute("params", string);
+        boolean validParams = true;
+        if (format != null) {
+            try {
+                documentFormat = DocumentFormat.valueOf(format.toUpperCase());
+            } catch (IllegalArgumentException ignored) {
+                message = "Invalid document format";
+                validParams = false;
+            }
+        }
+        if (filter != null) {
+            try {
+                dateFilter = Date.valueOf(filter);
+            } catch (IllegalArgumentException ignored) {
+                message = "Invalid date filter";
+                validParams = false;
+            }
+        }
+
+        if (validParams) {
+            documentGenerator.createReport(documentFormat, dateFilter);
+            mailService.sendEmail(email, documentFormat);
+            model.addAttribute("success", "Mail has been sent to " + email);
+        }
+
+        model.addAttribute("params", message);
         return "page";
     }
 

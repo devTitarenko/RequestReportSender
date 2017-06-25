@@ -1,9 +1,13 @@
 package com.github.titarenko.reporter;
 
+import com.github.titarenko.dao.impl.RequestDaoImpl;
+import com.github.titarenko.model.DocumentFormat;
+import com.github.titarenko.model.ReportItem;
 import com.github.titarenko.model.Request;
-import com.github.titarenko.model.Session;
 import com.github.titarenko.model.User;
-import com.github.titarenko.service.UserService;
+import com.github.titarenko.service.RequestService;
+import com.sun.org.apache.xml.internal.serialize.LineSeparator;
+import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -12,100 +16,129 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.servlet.ServletContext;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Component
+@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class DocumentGenerator {
 
     @Autowired
-    private UserService userService;
+    private RequestService requestService;
+    @Autowired
+    private ServletContext servletContext;
 
-    public void createDoc() {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (User user : userService.getAllUsers()) {
-            for (Session session : user.getSessionList()) {
-                for (Request request : session.getRequestList()){
-                    stringBuilder.append("/"+user.getUserName());
-                    stringBuilder.append("/"+user.getUserGroup().getGroupName());
-                    stringBuilder.append("/"+session.getDateOpened());
-                    stringBuilder.append("/"+session.getDateClosed());
-                    stringBuilder.append("/"+request.getUrl());
-                    stringBuilder.append("/"+request.getMethod());
-                    stringBuilder.append("/"+request.getParams());
-                    stringBuilder.append("\n");
-                }
-            }
+    private String uploadPath;
+    private static final String FILE_NAME = "report";
+    private List<ReportItem> reportItemList;
+
+    private static final Logger LOGGER = Logger.getLogger(RequestDaoImpl.class);
+
+    @PostConstruct
+    private void init() {
+        LOGGER.info("DocumentGenerator initialized...");
+        uploadPath = servletContext.getRealPath("") + File.separator;
+        reportItemList = new ArrayList<>();
+    }
+
+    public void createReport(DocumentFormat documentFormat, Date dateFilter) {
+//        reportItemList.add(new Object[]{"Country", "Location", "User name",
+//                "User group", "Session date opened", "Session date closed",
+//                "Request URL", "Request method", "Request params"});
+
+        List<Request> requestList = (dateFilter == null) ? requestService.getAllRequests() :
+                requestService.getRequestsByDate(dateFilter);
+        for (Request request : requestList) {
+            User user = request.getSession().getUser();
+            ReportItem reportItem = new ReportItem(
+                    user.getLocation().getCountry().getCountryName(),
+                    user.getLocation().getLocationName(),
+                    user.getUserName(),
+                    user.getUserGroup().getGroupName(),
+                    request.getSession().getDateOpened(),
+                    request.getSession().getDateClosed(),
+                    request.getUrl(),
+                    request.getMethod(),
+                    request.getParams());
+            reportItemList.add(reportItem);
         }
 
-        //Blank Document
+        Collections.sort(reportItemList);
+
+        LOGGER.info("reportItemList.size(): " + reportItemList.size());
+        switch (documentFormat) {
+            case DOC:
+                createDoc();
+                break;
+            case XLS:
+                createXls();
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    private void createDoc() {
         XWPFDocument document = new XWPFDocument();
-        //Write the Document in file system
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream(
-                    new File("D:/Dropbox/JAVA/RestForEmailingDoc/report.docx"));
-            //create Paragraph
-            XWPFParagraph paragraph = document.createParagraph();
-            XWPFRun run = paragraph.createRun();
-            run.setText(stringBuilder.toString());
+        XWPFParagraph paragraph = document.createParagraph();
+        XWPFRun run = paragraph.createRun();
+
+        try (FileOutputStream out = new FileOutputStream(
+                new File(uploadPath + FILE_NAME + ".doc"))) {
+
+            for (ReportItem item : reportItemList) {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (Object obj : item) {
+                    stringBuilder.append("/").append(obj);
+                }
+                run.setText(stringBuilder.toString());
+                run.addBreak();
+            }
 
             document.write(out);
-            out.close();
-            System.out.println("Doc written successfully...");
+            LOGGER.info("Doc written successfully...");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void createXls() {
+    private void createXls() {
         HSSFWorkbook workbook = new HSSFWorkbook();
-        HSSFSheet sheet = workbook.createSheet("Sample sheet");
+        HSSFSheet sheet = workbook.createSheet("Requests Report sheet");
 
-        Map<String, Object[]> data = new HashMap<String, Object[]>();
-        data.put("1", new Object[]{"Emp No.", "Name", "Salary"});
-        data.put("2", new Object[]{1d, "John", 1500000d});
-        data.put("3", new Object[]{2d, "Sam", 800000d});
-        data.put("4", new Object[]{3d, "Dean", 700000d});
-
-        Set<String> keyset = data.keySet();
-        int rownum = 0;
-        for (String key : keyset) {
-            Row row = sheet.createRow(rownum++);
-            Object[] objArr = data.get(key);
-            int cellnum = 0;
-            for (Object obj : objArr) {
-                Cell cell = row.createCell(cellnum++);
+        int rowNum = 0;
+        for (ReportItem item : reportItemList) {
+            Row row = sheet.createRow(rowNum++);
+            int columnNum = 0;
+            for (Object obj : item) {
+                Cell cell = row.createCell(columnNum++);
                 if (obj instanceof Date)
-                    cell.setCellValue((Date) obj);
+                    cell.setCellValue(obj.toString());
                 else if (obj instanceof Boolean)
                     cell.setCellValue((Boolean) obj);
                 else if (obj instanceof String)
                     cell.setCellValue((String) obj);
+                else if (obj instanceof Long)
+                    cell.setCellValue((Long) obj);
                 else if (obj instanceof Double)
                     cell.setCellValue((Double) obj);
             }
         }
 
-        try {
-
-            FileOutputStream out = new FileOutputStream(
-                    new File("D:/Dropbox/JAVA/RestForEmailingDoc/report.xls"));
+        try (FileOutputStream out = new FileOutputStream(
+                new File(uploadPath + FILE_NAME + ".xls"))) {
             workbook.write(out);
-            out.close();
-            System.out.println("Excel written successfully...");
-
+            LOGGER.info("Excel written successfully...");
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }
