@@ -1,7 +1,7 @@
 For launching
 -------------------------
 
-Fill in all fields in src/main/resources/properties/application.properties.
+Fill in all fields in src/main/resources/META-INF/application.properties.
 
 For initialization database use liquibase scripts. Just do `mvn install`.
 
