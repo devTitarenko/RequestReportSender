@@ -28,9 +28,9 @@ public class MainController {
                          @RequestParam(required = false, value = "doc_format") String format,
                          @RequestParam(required = false, value = "filter") String dateFilter) {
 
-        String string = "email = " + email +
-                ", doc_format = " + format +
-                ", filter = " + dateFilter;
+        String string = "email: " + email +
+                ", doc_format: " + format +
+                ", filter: " + dateFilter;
         DocumentFormat documentFormat = DocumentFormat.valueOf(format.toUpperCase());
 
         documentGenerator.createReport(documentFormat, Date.valueOf(dateFilter));
