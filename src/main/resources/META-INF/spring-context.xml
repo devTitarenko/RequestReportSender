@@ -42,11 +42,26 @@
 
     <bean id="datasource"
           class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="${jdbc.driverClassName}" />
-        <property name="url" value="${jdbc.url}" />
-        <property name="username" value="${jdbc.username}" />
-        <property name="password" value="${jdbc.password}" />
+        <property name="driverClassName" value="${datasource.driverClassName}" />
+        <property name="url" value="${url}" />
+        <property name="username" value="${datasource.username}" />
+        <property name="password" value="${password}" />
     </bean>
 
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="${mailSender.host}" />
+        <property name="port" value="${mailSender.port}" />
+        <property name="username" value="${mailSender.login}" />
+        <property name="password" value="${mailSender.password}" />
+
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.smtp.starttls.enable">true</prop>
+                <prop key="mail.transport.protocol">smtp</prop>
+                <prop key="mail.debug">true</prop>
+            </props>
+        </property>
+    </bean>
 
 </beans>
