@@ -1,7 +1,8 @@
 package com.github.titarenko.model;
 
-import java.lang.reflect.Array;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
 
 public class ReportItem implements Iterable, Comparable<ReportItem> {
 
@@ -15,6 +16,7 @@ public class ReportItem implements Iterable, Comparable<ReportItem> {
     private String method;
     private String params;
 
+    public static Object[] header;
     private Object[] objectsArray;
     private int cursor;
 
@@ -30,6 +32,7 @@ public class ReportItem implements Iterable, Comparable<ReportItem> {
         this.url = url;
         this.method = method;
         this.params = params;
+
         objectsArray = new Object[]{
                 this.countryName,
                 this.locationName,
@@ -40,7 +43,10 @@ public class ReportItem implements Iterable, Comparable<ReportItem> {
                 this.url,
                 this.method,
                 this.params};
-        System.out.println(Arrays.toString(objectsArray));
+
+        header = new Object[]{"Country", "Location", "User name",
+                "User group", "Session date opened", "Session date closed",
+                "Request URL", "Request method", "Request params"};
     }
 
     @Override
@@ -64,6 +70,21 @@ public class ReportItem implements Iterable, Comparable<ReportItem> {
         int locationCompare = locationName.compareTo(that.getLocationName());
         int dateCompare = dateOpened.compareTo(that.getDateOpened());
         return countryCompare == 0 ? (locationCompare == 0 ? dateCompare : locationCompare) : countryCompare;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ReportItem that = (ReportItem) o;
+
+        return Arrays.equals(objectsArray, that.objectsArray);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(objectsArray);
     }
 
     public String getCountryName() {

@@ -5,7 +5,6 @@ import com.github.titarenko.model.DocumentFormat;
 import com.github.titarenko.service.MailService;
 import com.github.titarenko.validation.EmailValidator;
 import com.github.titarenko.validation.Validator;
-import com.sun.org.apache.xml.internal.serialize.LineSeparator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
@@ -16,8 +15,6 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletContext;
 import java.io.File;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service("mailService")
 public class MailServiceImpl implements MailService {
@@ -60,15 +57,20 @@ public class MailServiceImpl implements MailService {
             helper.setSubject("Report of request data by users");
             helper.setTo(email);
             String content = "Thank you for using the REST service and checking out my application!" +
-                    LineSeparator.Windows + "For more visit my repository: github.com/devTitarenko";
-
-            helper.setText(content);
+                    System.lineSeparator() + "For more visit my repository: github.com/devTitarenko";
 
             // Add a resource as an attachment
             String uploadPath = servletContext.getRealPath("") +
                     File.separator + FILE_NAME + format.getName();
-            LOGGER.info("Document path: " + uploadPath);
-            helper.addAttachment(FILE_NAME + format.getName(), new File(uploadPath));
+            File attachment = new File(uploadPath);
+            if (attachment.exists()) {
+                helper.addAttachment(FILE_NAME + format.getName(), attachment);
+            } else {
+                content += System.lineSeparator() + "Sorry, but there are no requests in DB with this filter";
+            }
+
+            LOGGER.info("Is document exists: " + uploadPath + "? - " + attachment.exists());
+            helper.setText(content);
         };
     }
 }

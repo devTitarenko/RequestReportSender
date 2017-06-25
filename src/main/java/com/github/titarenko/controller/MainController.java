@@ -1,15 +1,16 @@
 package com.github.titarenko.controller;
 
+import com.github.titarenko.dao.impl.RequestDaoImpl;
 import com.github.titarenko.model.DocumentFormat;
-import com.github.titarenko.reporter.DocumentGenerator;
 import com.github.titarenko.service.MailService;
+import com.github.titarenko.service.Reporter;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.sql.Date;
 
@@ -18,9 +19,11 @@ import java.sql.Date;
 public class MainController {
 
     @Autowired
-    private DocumentGenerator documentGenerator;
+    private Reporter reporter;
     @Autowired
     private MailService mailService;
+
+    private static final Logger LOGGER = Logger.getLogger(RequestDaoImpl.class);
 
     @RequestMapping(value = "/")
     public String requestWithParams(ModelMap model,
@@ -31,6 +34,7 @@ public class MainController {
         String message = "email: " + email +
                 ", doc format: " + format +
                 ", filter: " + filter;
+        LOGGER.info("Input parameters: " + message);
 
         DocumentFormat documentFormat = DocumentFormat.DOC;
         Date dateFilter = null;
@@ -54,11 +58,12 @@ public class MainController {
         }
 
         if (validParams) {
-            documentGenerator.createReport(documentFormat, dateFilter);
+            reporter.createReport(documentFormat, dateFilter);
             mailService.sendEmail(email, documentFormat);
             model.addAttribute("success", "Mail has been sent to " + email);
         }
 
+        LOGGER.info(message);
         model.addAttribute("params", message);
         return "page";
     }
