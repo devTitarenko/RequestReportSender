@@ -58,9 +58,13 @@ public class MainController {
         }
 
         if (validParams) {
-            reporter.createReport(documentFormat, dateFilter);
-            mailService.sendEmail(email, documentFormat);
-            model.addAttribute("success", "Mail has been sent to " + email);
+            try {            
+                reporter.createReport(documentFormat, dateFilter);
+                mailService.sendEmail(email, documentFormat);
+                model.addAttribute("success", "Mail has been sent to " + email);
+            } catch (IllegalArgumentException e) {
+                message = e.getMessage();
+            }                
         }
 
         LOGGER.info(message);
